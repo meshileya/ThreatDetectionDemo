@@ -9,15 +9,15 @@ data class ThreatResponse(
 )
 
 data class ThreatUrl(
-    val blacklists: ThreatBlacklists,
-    val date_added: String,
-    val host: String,
-    val id: Int,
-    val larted: String,
-    val reporter: String,
-    val tags: List<String>,
+    val blacklists: ThreatBlacklists? = null,
+    val date_added: String?,
+    val host: String?,
+    val id: Int?,
+    val larted: String?,
+    val reporter: String?,
+    val tags: List<String>?,
     val threat: String?,
-    val url: String,
+    val url: String?,
     @SerializedName("url_status")
     val urlStatus: String?,
     @SerializedName("urlhaus_reference")

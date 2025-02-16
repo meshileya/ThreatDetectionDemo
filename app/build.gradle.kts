@@ -83,6 +83,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.dagger.hilt.android)
+    testImplementation(libs.androidx.runner)
     kapt(libs.hilt.compiler)
 
 
@@ -101,12 +102,22 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.retrofit2.kotlin.coroutines.adapter)
     //Test
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
-    testImplementation(libs.turbine)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.androidx.core.testing)
+    testImplementation (libs.junit.jupiter.api)
+    testImplementation (libs.junit.jupiter.engine)
+    testImplementation (libs.mockk)
+    testImplementation (libs.mockito.core.v3112)
+    testImplementation(libs.hilt.android.testing)
+    kaptTest(libs.hilt.compiler.v244)
+    androidTestImplementation(libs.hilt.android.testing)
+    kaptAndroidTest(libs.hilt.compiler)
+    testImplementation (libs.androidx.hilt.lifecycle.viewmodel)
+    testImplementation (libs.hilt.android.testing.v2391)
+    testImplementation (libs.org.jetbrains.kotlinx.kotlinx.coroutines.test)
+    testImplementation (libs.org.jetbrains.kotlinx.kotlinx.coroutines.test)
+    testImplementation (libs.kotlinx.coroutines.core)
+    testImplementation (libs.kotlinx.coroutines.test.v173)
+
+
 }

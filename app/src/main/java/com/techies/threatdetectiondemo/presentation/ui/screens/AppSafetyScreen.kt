@@ -4,8 +4,8 @@ import android.app.Activity
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -29,63 +29,64 @@ import com.techies.threatdetectiondemo.presentation.viewmodel.ThreatsViewModel
 
 @Composable
 fun AppSafetyScreen(viewModel: ThreatsViewModel = hiltViewModel()) {
-
     val context = LocalContext.current
     val threatsState = viewModel.threats.collectAsStateWithLifecycle().value
 
     LaunchedEffect(threatsState) {
         if (threatsState is Result.Error) {
-            val errorMessage = threatsState.message
-            Toast.makeText(context, "Error: $errorMessage", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Error: ${threatsState.message}", Toast.LENGTH_LONG).show()
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = colorResource(id = R.color.background))
-    ) {
+    Scaffold(topBar = {
         TopAppBar(
             title = { Text("Apps safety") },
             backgroundColor = colorResource(id = R.color.background),
             navigationIcon = {
-                val context = LocalContext.current
                 IconButton(onClick = { (context as? Activity)?.finish() }) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                 }
             },
             elevation = 0.dp
         )
+    }) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = colorResource(id = R.color.background))
+                .padding(paddingValues)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                ThreatAlertCard(viewModel) { viewModel.startScan() }
+                AppProtectionStatus(viewModel)
 
-        ThreatAlertCard(viewModel) {
-            viewModel.startScan()
-        }
+                when (threatsState) {
+                    is Result.Loading -> {
+                        if (threatsState.message != null)
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                    .wrapContentWidth(Alignment.CenterHorizontally)
+                            )
+                    }
 
-        Spacer(modifier = Modifier.height(8.dp))
+                    is Result.Success -> RiskyAppsList(threatsState.data)
 
-        AppProtectionStatus(viewModel)
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        when (threatsState) {
-            is Result.Loading -> {
-                if (threatsState.message != null)
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-            }
-
-            is Result.Success -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(18.dp)
-                ) {
-                    RiskyAppsList(threats = threatsState.data)
+                    is Result.Error -> Text(
+                        text = "Error: ${threatsState.message}",
+                        color = Color.Red,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .wrapContentWidth(Alignment.CenterHorizontally)
+                    )
                 }
-//                RiskyAppsList(threats = threatsState.data)
-            }
-
-
-            is Result.Error -> {
             }
         }
     }
@@ -95,15 +96,17 @@ fun AppSafetyScreen(viewModel: ThreatsViewModel = hiltViewModel()) {
 fun RiskyAppsList(threats: List<ThreatUIItem>) {
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(18.dp)
+            .background(colorResource(id = R.color.background))
+            .padding(16.dp)
     ) {
-        LazyColumn {
-            items(items = threats) { threat ->
-                ThreatItem(
-                    item = threat
-                )
+        Column(
+            modifier = Modifier
+                .background(Color.White)
+                .padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            threats.forEach { threat ->
+                ThreatItem(item = threat)
             }
         }
     }
